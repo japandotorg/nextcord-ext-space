@@ -26,11 +26,11 @@ def common_table(table, *, unknown=False):
     def wrapper(func):
         @wraps(func)
         async def wrapped(self, *args, **kwargs) -> None:
-            save = getattr(self.recorder, 'save_{}'.format(table))
+            save = getattr(self.recorder, f'save_{table}')
             args = await func(self, *args, **kwargs)
             if args is None:
                 return
-            
+
             if unknown:
                 await save(*args, **kwargs, unknown=unknown)
             else:
@@ -47,18 +47,18 @@ class Earth:
         self.op_flags = op_flags
         
     async def log(self, event_name, *args, **kwargs):
-        handler = getattr(self, 'on_{}'.format(event_name), None)
+        handler = getattr(self, f'on_{event_name}', None)
         try:
             payload: dict = args[0]
         except IndexError:
             return
-        
+
         if type(payload) is bytes:
             return # ping
-        
+
         if handler is None:
             return await self.on_unknown_event(event_name, payload)
-        
+
         if type(payload) is dict:
             await self.recorder.save_events(event_name, payload)
         await handler(*args, **kwargs)
@@ -71,15 +71,14 @@ class Earth:
     @common_table('packets')
     async def on_socket_response(self, payload: dict) -> typing.Optional[typing.Tuple[int, OpDetails]]:
         op_code = payload['op']
-        
-        handler = getattr(self, 'on_socket_op_{}'.format(op_code), None)
-        
+
+        handler = getattr(self, f'on_socket_op_{op_code}', None)
+
         details = OpDetails(inbound=True, payload=payload)
         if handler:
             details = await handler(payload)
-        
-        should_log = OP_DICT[op_code](self.op_flags)
-        if should_log:
+
+        if should_log := OP_DICT[op_code](self.op_flags):
             return op_code, details
         
     @common_table('packets')
@@ -88,16 +87,13 @@ class Earth:
 
         details = OpDetails(inbound=False, payload=payload)
 
-        should_log = OP_DICT[op_code](self.op_flags)
-        if should_log:
+        if should_log := OP_DICT[op_code](self.op_flags):
             return op_code, details
     
     async def on_socket_op_0(self, payload: dict) -> OpDetails:
         event_name = payload['t']
 
-        handler = getattr(self, 'on_socket_{}'.format(event_name), None)
-
-        if handler:
+        if handler := getattr(self, f'on_socket_{event_name}', None):
             await handler(payload)
 
         return OpDetails(inbound=True, event_name=event_name, payload=payload)

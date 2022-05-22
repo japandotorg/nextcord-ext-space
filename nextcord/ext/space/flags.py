@@ -58,18 +58,18 @@ class propmethod:
         
 class BaseSpaceFlags(BaseFlags):
     @propmethod
-    def all(cls):
-        bits = max(cls.VALID_FLAGS.values()).bit_length()
+    def all(self):
+        bits = max(self.VALID_FLAGS.values()).bit_length()
         return (1 << bits) - 1
     
     @propmethod
-    def none(cls):
-        return cls.DEFAULT_VALUE
+    def none(self):
+        return self.DEFAULT_VALUE
     
 @fill_with_flags()
 class EventFlags(BaseSpaceFlags):
     @propmethod
-    def guilds(cls):
+    def guilds(self):
         return 127
     
     guild_join = auto('The on_guild_join event')
@@ -81,7 +81,7 @@ class EventFlags(BaseSpaceFlags):
     guild_channel_delete = auto('The on_guild_channel_pins_update event')
     
     @propmethod
-    def members(cls):
+    def members(self):
         return 896
     
     member_join = auto('The on_member_join event')
@@ -89,51 +89,51 @@ class EventFlags(BaseSpaceFlags):
     member_update = auto('The on_member_update event')
     
     @propmethod
-    def bans(cls):
+    def bans(self):
         return 3072
     
     member_ban = auto('The on_member_ban event')
     member_unban = auto('The on_member_unban event')
     
     @propmethod
-    def emojis(cls):
+    def emojis(self):
         return 4096
     
     guild_emojis_update = auto('The on_guild_emojis_update event')
 
     @propmethod
-    def integrations(cls):
+    def integrations(self):
         return 8192
 
     guild_integrations_update = auto('The on_guild_integrations_update event')
 
     @propmethod
-    def webhooks(cls):
+    def webhooks(self):
         return 16384
     
     webhooks_update = auto('The on_webhooks_update event')
 
     @propmethod
-    def invites(cls):
+    def invites(self):
         return 98304
     
     invite_create = auto('The on_invite_create event')
     invite_delete = auto('The on_invite_delete event')
 
     @propmethod
-    def voice_states(cls):
+    def voice_states(self):
         return 131072
     
     voice_state_update = auto('The on_voice_state_update event')
 
     @propmethod
-    def presences(cls):
+    def presences(self):
         return 262144
     
     presence_update = auto('The on_member_update event')
 
     @propmethod
-    def messages(cls):
+    def messages(self):
         return 7864320
     
     message = auto('The on_message event')
@@ -142,7 +142,7 @@ class EventFlags(BaseSpaceFlags):
     private_channel_create = auto('The on_private_channel_create event')
 
     @propmethod
-    def reactions(cls):
+    def reactions(self):
         return 58720256
     
     reaction_add = auto('The on_reaction_add event')
